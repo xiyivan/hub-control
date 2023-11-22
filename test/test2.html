@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Custom Buttons</title>
+    <style>
+        #button-container {
+            position: relative;
+        }
+        .custom-button {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            
+        }
+    </style>
+</head>
+<body >
+    <div id="button-container"></div>
+
+    <script>
+        // Function to create a new button
+        function createButton(x, y, imageUrl, dataCharacter) {
+            // Create a new button element
+            var btn = document.createElement("button");
+
+            // Set the button's properties
+            btn.style.left = x + "px";
+            btn.style.top = y + "px";
+            btn.style.backgroundImage = "url('" + imageUrl + "')";
+            btn.dataset.character = dataCharacter;
+            btn.className = "custom-button";
+            btn.textContent = " ";
+
+            // Add the button to the button container
+            document.getElementById("button-container").appendChild(btn);
+        }
+
+        // test
+        createButton(50, 50, "https://vip.helloimg.com/images/2023/11/22/owuIPu.png", "a");
+        createButton(100, 100, "https://vip.helloimg.com/images/2023/11/22/owu7gt.png", "b");
+    </script>
+</body>
+</html>

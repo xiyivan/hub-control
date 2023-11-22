@@ -3,14 +3,29 @@
 <head>
 <meta charset="utf-8">
 <title>hub control</title>
+<style>
+        #button-container {
+            position: relative;
+        }
+        .custom-button {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            
+        }
+</style>
 </head>
 <body>
+    <!--
+        connection
+    -->
     <script>
         // Create WebSocket connection.
         const socket = new WebSocket('ws://localhost:8080');
         socket.addEventListener('open', (event) => {
             // Get button elements
-            const buttons = document.querySelectorAll('.myButton');
+            const buttons = document.querySelectorAll('.custom-button');
 
             // Add event listener to each button
             buttons.forEach(button => {
@@ -28,8 +43,22 @@
         
     </script>
 
- 
+    <!--
+        button
+    -->
+    <button id="generate">
+        download config
+    </button>
+    <div id="button-container"></div>
+    <script src="save.js"></script>
+    
+
+    <!--
+
     <button class="myButton" data-character="V">send V</button>
+    -->
+
+
  
 </body>
 </html>
