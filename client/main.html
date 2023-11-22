@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>hub control</title>
+</head>
+<body>
+    <script>
+        // Create WebSocket connection.
+        const socket = new WebSocket('ws://localhost:8080');
+        socket.addEventListener('open', (event) => {
+            // Get button elements
+            const buttons = document.querySelectorAll('.myButton');
+
+            // Add event listener to each button
+            buttons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    // Send character to the server
+                    const character = event.target.getAttribute('data-character');
+                    socket.send(character);
+
+                    console.log(character)
+                });
+            });
+
+
+        })
+        
+    </script>
+
+ 
+    <button class="myButton" data-character="V">send V</button>
+ 
+</body>
+</html>
