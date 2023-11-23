@@ -22,25 +22,27 @@
     -->
     <script>
         // Create WebSocket connection.
-        const socket = new WebSocket('ws://localhost:8080');
+        const ip = "10.248.195.99"
+        //const ip = 'localhost'
+        const socket = new WebSocket('ws://' + ip + ':8080');
         socket.addEventListener('open', (event) => {
-            // Get button elements
-            const buttons = document.querySelectorAll('.custom-button');
+            // Get button container
+            const buttonContainer = document.querySelector('#button-container');
 
-            // Add event listener to each button
-            buttons.forEach(button => {
-                button.addEventListener('click', (event) => {
+            // Add event listener to the button container
+            buttonContainer.addEventListener('click', (event) => {
+                // Check if clicked element is a button
+                if (event.target.classList.contains('custom-button')) {
                     // Send character to the server
                     const character = event.target.getAttribute('data-character');
                     socket.send(character);
 
                     console.log(character)
-                });
+                }
             });
-
-
         })
         
+    </script>
     </script>
 
     <!--
@@ -52,12 +54,6 @@
     <input type="file" id="jsonFile" accept=".json">
     <div id="button-container"></div>
     <script src="save.js"></script>
-    
-
-    <!--
-
-    <button class="myButton" data-character="V">send V</button>
-    -->
 
 
  
