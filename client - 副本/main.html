@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>hub control</title>
+<style>
+        #button-container {
+            position: relative;
+        }
+        .custom-button {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            
+        }
+</style>
+</head>
+<body>
+    <!--
+        connection
+    -->
+    <script>
+        // Create WebSocket connection.
+        const ip = "10.248.197.204"
+        //const ip = 'localhost'
+        const socket = new WebSocket('ws://' + ip + ':8080');
+        socket.addEventListener('open', (event) => {
+            // Get button container
+            const buttonContainer = document.querySelector('#button-container');
+
+            // Add event listener to the button container
+            buttonContainer.addEventListener('click', (event) => {
+                // Check if clicked element is a button
+                if (event.target.classList.contains('custom-button')) {
+                    // Send character to the server
+                    const character = event.target.getAttribute('data-character');
+                    socket.send(character);
+
+                    console.log(character)
+                }
+            });
+        })
+        
+    </script>
+    </script>
+
+    <!--
+        button
+    -->
+    <button id="generate">
+        download config
+    </button>
+    <input type="file" id="jsonFile" accept=".json">
+    <div id="button-container"></div>
+    <script src="save.js"></script>
+
+
+ 
+</body>
+</html>

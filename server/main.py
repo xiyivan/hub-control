@@ -1,15 +1,23 @@
 import asyncio
 from websockets.server import serve
-import pydirectinput as pi
+from pydirectinput import press
+import socket
+from time import time
+
+print(socket.gethostbyname(socket.gethostname()))
 
 async def main(websocket):
     async for message in websocket:
         print(message)
-        pi.press(message)
+        press(message)
+        if time() - startt > 600:
+            connect()
         
 
 async def connect():
-    async with serve(main, "0.0.0.0b", 8080):
+    global startt
+    startt = time()
+    async with serve(main, "0.0.0.0", 8080):
         await asyncio.Future()
 
 asyncio.run(connect())

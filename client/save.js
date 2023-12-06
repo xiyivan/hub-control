@@ -38,8 +38,8 @@ function saveButtonConfigs() {
 document.getElementById("generate").addEventListener("click",saveButtonConfigs);
 
 // test
-createButton(0, 0, "https://vip.helloimg.com/images/2023/11/22/owuIPu.png", "a");
-createButton(100, 0, "https://vip.helloimg.com/images/2023/11/22/owu7gt.png", "b");
+//createButton(0, 0, "https://vip.helloimg.com/images/2023/11/22/owuIPu.png", "a");
+//createButton(100, 0, "https://vip.helloimg.com/images/2023/11/22/owu7gt.png", "b");
 document.getElementById('jsonFile').addEventListener('change', function() {
     var reader = new FileReader();
     reader.onload = function() {
