@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d1117">
+<title>hub-control v2</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div id="app">
+    <!-- Toolbar -->
+    <div id="toolbar">
+        <button class="toolbar-btn" id="btn-toggle-mode" title="Switch Mode">▶️</button>
+        <span class="toolbar-title">hub-control</span>
+        <span id="connection-indicator" class="disconnected" title="WebSocket status"></span>
+        <button class="toolbar-btn" id="btn-menu" title="Menu">☰</button>
+    </div>
+
+    <!-- Play Mode -->
+    <div id="play-mode">
+        <div id="control-surface"></div>
+    </div>
+
+    <!-- Edit Mode -->
+    <div id="edit-mode">
+        <div id="editor-surface"></div>
+        <div id="properties-panel"></div>
+    </div>
+
+    <!-- Edit Mode Toolbar -->
+    <div id="editor-toolbar">
+        <span style="font-size:11px;color:var(--text-muted);margin-right:4px;">Add:</span>
+        <button class="editor-action-btn" id="btn-add-joystick">🕹️ Joystick</button>
+        <button class="editor-action-btn" id="btn-add-trigger">📊 Trigger</button>
+        <button class="editor-action-btn" id="btn-add-xbox">🎮 XboxBtn</button>
+        <button class="editor-action-btn" id="btn-add-shoulder">🔘 Shoulder</button>
+        <button class="editor-action-btn" id="btn-add-dpad">➕ D-Pad</button>
+        <button class="editor-action-btn" id="btn-add-key">⌨️ Key</button>
+        <span style="flex:1;"></span>
+        <button class="editor-action-btn" id="btn-undo" style="opacity:0.4;">↩️ Undo</button>
+        <button class="editor-action-btn" id="btn-redo" style="opacity:0.4;">↪️ Redo</button>
+        <button class="editor-action-btn active" id="btn-grid-toggle">📐 Grid</button>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Menu Overlay & Drawer -->
+    <div id="menu-overlay"></div>
+    <div id="menu-drawer">
+        <div class="menu-header">Layout</div>
+        <button class="menu-item" id="menu-new-layout">📄 New Layout</button>
+        <button class="menu-item" id="btn-save-profile">💾 Save Profile</button>
+
+        <div class="menu-divider"></div>
+        <div class="menu-header">Profiles</div>
+        <div class="profile-list" id="profile-list"></div>
+
+        <div class="menu-divider"></div>
+        <div class="menu-header">Import / Export</div>
+        <button class="menu-item" id="menu-export">📤 Export Layout (.hublayout)</button>
+        <button class="menu-item" id="menu-export-legacy">📤 Export Legacy (buttonConfigs.json)</button>
+        <button class="menu-item" id="menu-import">📥 Import Layout</button>
+        <input type="file" id="import-file-input" class="hidden-input" accept=".json,.hublayout">
+
+        <div class="menu-divider"></div>
+        <div class="menu-header">Settings</div>
+        <button class="menu-item" id="menu-settings">⚙️ Settings</button>
+    </div>
+</div>
+
+<!-- Scripts (order matters) -->
+<script src="js/websocket.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/controls.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+// Boot the app when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    const app = new HubControl.App();
+
+    // Hook save profile button (in menu)
+    document.getElementById('btn-save-profile').addEventListener('click', () => {
+        app.ui.closeMenu();
+        app.saveCurrentProfile();
+    });
+
+    // Expose app globally for debugging
+    window.__app = app;
+});
+</script>
+</body>
+</html>

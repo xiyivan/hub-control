@@ -1,0 +1,110 @@
+{
+  "version": 2,
+  "name": "Euro Truck Simulator 2",
+  "gridSize": 20,
+  "description": "Layout for ETS2: left joystick (steering), left trigger (brake LT), right trigger (throttle RT), D-Pad (menus), Xbox buttons, keyboard F-keys, shoulder turn signals",
+  "controls": [
+    {
+      "id": "ets2_joystick",
+      "type": "joystick",
+      "x": 10, "y": 150, "w": 180, "h": 180,
+      "properties": { "label": "Steering", "stickMapping": "leftStick", "deadZone": 0.12 }
+    },
+    {
+      "id": "ets2_brake",
+      "type": "trigger",
+      "x": 210, "y": 150, "w": 60, "h": 180,
+      "properties": { "label": "Brake", "triggerMapping": "left", "springReturn": true }
+    },
+    {
+      "id": "ets2_throttle",
+      "type": "trigger",
+      "x": 290, "y": 150, "w": 60, "h": 180,
+      "properties": { "label": "Throttle", "triggerMapping": "right", "springReturn": true }
+    },
+    {
+      "id": "ets2_dpad",
+      "type": "dpad",
+      "x": 140, "y": 360, "w": 120, "h": 120,
+      "properties": { "label": "Menu Nav" }
+    },
+    {
+      "id": "ets2_a",
+      "type": "xboxButton",
+      "x": 370, "y": 380, "w": 50, "h": 50,
+      "properties": { "label": "Enter", "button": "A" }
+    },
+    {
+      "id": "ets2_b",
+      "type": "xboxButton",
+      "x": 420, "y": 340, "w": 50, "h": 50,
+      "properties": { "label": "Cancel", "button": "B" }
+    },
+    {
+      "id": "ets2_x",
+      "type": "xboxButton",
+      "x": 320, "y": 340, "w": 50, "h": 50,
+      "properties": { "label": "", "button": "X" }
+    },
+    {
+      "id": "ets2_y",
+      "type": "xboxButton",
+      "x": 370, "y": 300, "w": 50, "h": 50,
+      "properties": { "label": "", "button": "Y" }
+    },
+    {
+      "id": "ets2_lb",
+      "type": "shoulderButton",
+      "x": 10, "y": 100, "w": 80, "h": 36,
+      "properties": { "label": "Turn L", "button": "LB" }
+    },
+    {
+      "id": "ets2_rb",
+      "type": "shoulderButton",
+      "x": 280, "y": 100, "w": 80, "h": 36,
+      "properties": { "label": "Turn R", "button": "RB" }
+    },
+    {
+      "id": "ets2_f3",
+      "type": "keyboardButton",
+      "x": 370, "y": 10, "w": 60, "h": 50,
+      "properties": { "label": "GPS", "key": "f3", "modifiers": [], "imageUrl": "" }
+    },
+    {
+      "id": "ets2_f5",
+      "type": "keyboardButton",
+      "x": 440, "y": 10, "w": 60, "h": 50,
+      "properties": { "label": "Advisor", "key": "f5", "modifiers": [], "imageUrl": "" }
+    },
+    {
+      "id": "ets2_f6",
+      "type": "keyboardButton",
+      "x": 10, "y": 10, "w": 60, "h": 50,
+      "properties": { "label": "Cargo", "key": "f6", "modifiers": [], "imageUrl": "" }
+    },
+    {
+      "id": "ets2_f7",
+      "type": "keyboardButton",
+      "x": 80, "y": 10, "w": 60, "h": 50,
+      "properties": { "label": "Service", "key": "f7", "modifiers": [], "imageUrl": "" }
+    },
+    {
+      "id": "ets2_f8",
+      "type": "keyboardButton",
+      "x": 150, "y": 10, "w": 60, "h": 50,
+      "properties": { "label": "Info", "key": "f8", "modifiers": [], "imageUrl": "" }
+    },
+    {
+      "id": "ets2_esc",
+      "type": "keyboardButton",
+      "x": 220, "y": 10, "w": 60, "h": 50,
+      "properties": { "label": "Menu", "key": "esc", "modifiers": [], "imageUrl": "" }
+    },
+    {
+      "id": "ets2_enter",
+      "type": "keyboardButton",
+      "x": 290, "y": 10, "w": 60, "h": 50,
+      "properties": { "label": "Enter", "key": "enter", "modifiers": [], "imageUrl": "" }
+    }
+  ]
+}

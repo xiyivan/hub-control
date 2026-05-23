@@ -1,0 +1,529 @@
+/* ================================================================
+   hub-control v2 — Main Stylesheet
+   Mobile-first dark theme, control styles, editor styles, animations
+   ================================================================ */
+
+/* --- Custom Properties (Design Tokens) --- */
+:root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #21262d;
+    --bg-surface: #30363d;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #6e7681;
+    --accent: #58a6ff;
+    --accent-emphasis: #1f6feb;
+    --success: #3fb950;
+    --warning: #d2991d;
+    --danger: #f85149;
+    --border: #30363d;
+    --border-active: #58a6ff;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-round: 50%;
+    --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "SF Mono", "Fira Code", monospace;
+    --toolbar-h: 44px;
+    --transition: 150ms ease;
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* --- App Shell --- */
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+/* --- Toolbar --- */
+#toolbar {
+    display: flex;
+    align-items: center;
+    height: var(--toolbar-h);
+    padding: 0 10px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+    flex-shrink: 0;
+    z-index: 100;
+}
+
+#toolbar .toolbar-title {
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toolbar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 18px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+    flex-shrink: 0;
+}
+.toolbar-btn:active { background: var(--bg-surface); color: var(--text-primary); }
+.toolbar-btn.active { background: var(--accent-emphasis); color: #fff; }
+
+#connection-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin: 0 4px;
+    transition: background var(--transition);
+}
+#connection-indicator.connected { background: var(--success); }
+#connection-indicator.disconnected { background: var(--danger); }
+#connection-indicator.reconnecting { background: var(--warning); animation: pulse 1s infinite; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* --- Mode Containers --- */
+#play-mode, #edit-mode {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+#play-mode { display: flex; }
+#edit-mode { display: none; }
+body.edit-mode #play-mode { display: none; }
+body.edit-mode #edit-mode { display: flex; }
+
+/* --- Control Canvas (Play Mode) --- */
+#control-surface {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    overflow: hidden;
+}
+
+/* --- Editor Canvas (Edit Mode) --- */
+#editor-surface {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    touch-action: manipulation;
+    overflow: hidden;
+    background-image:
+        radial-gradient(circle, var(--bg-tertiary) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* --- Control Base Styles --- */
+.control {
+    position: absolute;
+    cursor: pointer;
+    transition: box-shadow var(--transition);
+}
+body.edit-mode .control {
+    cursor: move;
+    outline: 2px dashed transparent;
+    transition: outline var(--transition), box-shadow var(--transition);
+}
+body.edit-mode .control.selected {
+    outline-color: var(--accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.2);
+}
+
+/* --- Joystick --- */
+.joystick {
+    border-radius: var(--radius-round);
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.joystick canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* --- Trigger / Slider --- */
+.trigger {
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+.trigger-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--accent);
+    opacity: 0.6;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    transition: height 50ms linear;
+}
+.trigger-thumb {
+    position: absolute;
+    left: 50%;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-round);
+    background: var(--accent-emphasis);
+    border: 2px solid var(--accent);
+    transform: translate(-50%, 0%);
+    box-shadow: var(--shadow);
+}
+
+/* --- Xbox Face Buttons --- */
+.xbox-btn {
+    border-radius: var(--radius-round);
+    border: 3px solid;
+    font-weight: 900;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    transition: transform 80ms ease, box-shadow 80ms ease;
+}
+.xbox-btn:active, .xbox-btn.pressed {
+    transform: scale(0.9);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+.xbox-btn.xbox-a { background: #2ea043; border-color: #3fb950; }
+.xbox-btn.xbox-b { background: #da3633; border-color: #f85149; }
+.xbox-btn.xbox-x { background: #1f6feb; border-color: #58a6ff; }
+.xbox-btn.xbox-y { background: #d2991d; border-color: #e3b341; }
+
+/* --- D-Pad --- */
+.dpad {
+    position: relative;
+    display: grid;
+    grid-template-areas:
+        ". up ."
+        "left . right"
+        ". down .";
+    gap: 2px;
+}
+.dpad-btn {
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 16px;
+    transition: background var(--transition), border-color var(--transition);
+}
+.dpad-btn:active, .dpad-btn.pressed {
+    background: var(--accent-emphasis);
+    border-color: var(--accent);
+    color: #fff;
+}
+.dpad-btn.up    { grid-area: up; }
+.dpad-btn.down  { grid-area: down; }
+.dpad-btn.left  { grid-area: left; }
+.dpad-btn.right { grid-area: right; }
+
+/* --- Shoulder Buttons --- */
+.shoulder-btn {
+    border-radius: var(--radius-md);
+    border: 2px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition), transform 80ms ease;
+}
+.shoulder-btn:active, .shoulder-btn.pressed {
+    background: var(--bg-surface);
+    transform: scale(0.95);
+}
+
+/* --- Keyboard Button --- */
+.key-btn {
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--border);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    word-break: break-all;
+    padding: 4px;
+    transition: background var(--transition), transform 80ms ease;
+    background-size: cover;
+    background-position: center;
+}
+.key-btn:active, .key-btn.pressed {
+    background-color: var(--bg-surface);
+    transform: scale(0.92);
+}
+
+/* --- Properties Panel --- */
+#properties-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    z-index: 200;
+    max-height: 60%;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 250ms ease;
+    padding: 16px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: var(--shadow-lg);
+}
+#properties-panel.open { transform: translateY(0); }
+
+#properties-panel h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: var(--accent);
+}
+
+.prop-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+}
+.prop-row label {
+    flex: 0 0 90px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.prop-row input, .prop-row select {
+    flex: 1;
+    padding: 8px 10px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: var(--font);
+}
+.prop-row input:focus, .prop-row select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.prop-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+}
+.prop-actions button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity var(--transition);
+}
+.prop-actions button:active { opacity: 0.8; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-primary { background: var(--accent-emphasis); color: #fff; }
+.btn-secondary { background: var(--bg-surface); color: var(--text-primary); }
+
+/* --- Edit Mode Toolbar Add-ons --- */
+#editor-toolbar {
+    display: none;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    gap: 6px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+body.edit-mode #editor-toolbar { display: flex; }
+
+.editor-action-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--transition), color var(--transition);
+}
+.editor-action-btn:active { background: var(--bg-surface); color: var(--text-primary); }
+.editor-action-btn.active { background: var(--accent-emphasis); color: #fff; border-color: var(--accent-emphasis); }
+
+/* --- Menu Drawer --- */
+#menu-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    background: var(--bg-secondary);
+    box-shadow: var(--shadow-lg);
+    z-index: 300;
+    transform: translateX(100%);
+    transition: transform 250ms ease;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+}
+#menu-drawer.open { transform: translateX(0); }
+
+#menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 299;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 250ms ease;
+}
+#menu-overlay.open { opacity: 1; pointer-events: auto; }
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background var(--transition);
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font);
+}
+.menu-item:active { background: var(--bg-tertiary); }
+.menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+}
+.menu-header {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 12px 4px;
+}
+
+/* --- Profile List in Menu --- */
+.profile-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+.profile-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background var(--transition);
+}
+.profile-item:active { background: var(--bg-tertiary); }
+.profile-item .profile-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-item .profile-actions { display: flex; gap: 4px; }
+.profile-item .profile-actions button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* --- Toast Notifications --- */
+#toast-container {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 400;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+.toast {
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 13px;
+    box-shadow: var(--shadow);
+    animation: toast-in 300ms ease, toast-out 300ms ease 2s forwards;
+    pointer-events: auto;
+}
+@keyframes toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes toast-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* --- Hide file inputs --- */
+input[type="file"].hidden-input {
+    display: none;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-surface); border-radius: 3px; }
