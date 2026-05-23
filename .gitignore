@@ -6,9 +6,16 @@ __pycache__/
 *.pyc
 *.pyo
 
+# PyInstaller build artifacts
+build/
+dist/
+*.spec.bak
+
 # IDE
 .vscode/
 
 # OS files
 .DS_Store
 Thumbs.db
+
+PLAN.md
