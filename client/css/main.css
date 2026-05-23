@@ -65,7 +65,8 @@ html, body {
     border-bottom: 1px solid var(--border);
     gap: 8px;
     flex-shrink: 0;
-    z-index: 100;
+    z-index: 350;
+    position: relative;
 }
 
 #toolbar .toolbar-title {
@@ -408,7 +409,7 @@ body.edit-mode #editor-toolbar { display: flex; }
 /* --- Menu Drawer --- */
 #menu-drawer {
     position: fixed;
-    top: 0;
+    top: var(--toolbar-h);
     right: 0;
     bottom: 0;
     width: 280px;
