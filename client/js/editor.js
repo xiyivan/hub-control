@@ -234,10 +234,12 @@ HubControl.Editor = class Editor {
             else if (prop === 'y') ctrl.y = parseInt(value) || 0;
             else if (prop === 'w') { ctrl.w = Math.max(20, parseInt(value) || 80); }
             else if (prop === 'h') { ctrl.h = Math.max(20, parseInt(value) || 80); }
-            else if (prop === 'deadZone') ctrl._deadZone = parseFloat(value) || 0.12;
-            else if (prop === 'stickMapping') ctrl._stickMapping = value;
-            else if (prop === 'triggerMapping') ctrl._triggerMapping = value;
-            else if (prop === 'springReturn') ctrl._springReturn = value === 'true';
+            else if (prop === 'deadZone') { ctrl._deadZone = parseFloat(value) || 0.12; ctrl.properties.deadZone = ctrl._deadZone; }
+            else if (prop === 'stickMapping') { ctrl._stickMapping = value; ctrl.properties.stickMapping = value; }
+            else if (prop === 'triggerMapping') { ctrl._triggerMapping = value; ctrl.properties.triggerMapping = value; }
+            else if (prop === 'springReturn') { ctrl._springReturn = value === 'true'; ctrl.properties.springReturn = ctrl._springReturn; }
+            else if (prop === 'button') { ctrl._button = value; ctrl.properties.button = value; }
+            else if (prop === 'alternateKey') { ctrl.properties.alternateKey = value; }
             else if (prop === 'modifiers') ctrl.properties.modifiers = value ? value.split(',').map(s => s.trim()).filter(Boolean) : [];
             else ctrl.properties[prop] = value;
         });
@@ -252,6 +254,13 @@ HubControl.Editor = class Editor {
                 ctrl.el.style.backgroundImage = `url('${ctrl.properties.imageUrl}')`;
             } else {
                 ctrl.el.style.backgroundImage = '';
+            }
+        }
+        if (ctrl.el && (ctrl.type === 'xboxButton' || ctrl.type === 'shoulderButton')) {
+            ctrl.el.textContent = ctrl._button || ctrl.properties.button || '';
+            ctrl.el.className = ctrl.el.className.replace(/\bxbox-\w+\b/g, '');
+            if (ctrl.type === 'xboxButton') {
+                ctrl.el.classList.add('xbox-' + (ctrl._button || ctrl.properties.button || 'a').toLowerCase());
             }
         }
 
@@ -288,7 +297,13 @@ HubControl.Editor = class Editor {
             dpad: [cx, cy, 130, 130],
             keyboardButton: [cx, cy, 80, 80],
         };
-        const [x, y, w, h] = defaults[type] || [cx, cy, 80, 80];
+        let [x, y, w, h] = defaults[type] || [cx, cy, 80, 80];
+
+        // Offset each new control by 30px so they don't overlap
+        const count = this.app.controls.size;
+        x += (count % 5) * 30;
+        y += (count % 5) * 30;
+
         const ctrl = this.app.createControl(type, x, y, w, h, {});
         this._pushUndo({ type: 'add', controlId: ctrl.id });
         this.selectControl(ctrl);

@@ -186,7 +186,6 @@ body.edit-mode .control.selected {
     border-radius: var(--radius-md);
     background: var(--bg-tertiary);
     border: 2px solid var(--border);
-    position: relative;
     overflow: hidden;
 }
 .trigger-fill {
@@ -236,7 +235,6 @@ body.edit-mode .control.selected {
 /* --- D-Pad --- */
 .dpad {
     position: relative;
-    display: grid;
     grid-template-areas:
         ". up ."
         "left . right"

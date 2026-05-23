@@ -156,7 +156,7 @@ class VirtualJoystick extends BaseControl {
 
         // Position indicator
         const dx = this._stateX * r;
-        const dy = this._stateY * r;
+        const dy = -this._stateY * r;  // negate: gamepad Y↑ → screen Y↓
         const indicatorR = 16;
         const ix = cx + dx;
         const iy = cy + dy;
@@ -187,7 +187,7 @@ class VirtualJoystick extends BaseControl {
         const r = Math.min(cx, cy) - 8;
 
         let dx = (touchX - rect.left - cx) / r;
-        let dy = (touchY - rect.top - cy) / r;
+        let dy = -(touchY - rect.top - cy) / r;  // negate: screen Y↓ → gamepad Y↑
 
         // Unit circle clamp
         const dist = Math.sqrt(dx * dx + dy * dy);
