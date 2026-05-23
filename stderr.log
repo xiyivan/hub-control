@@ -1,0 +1,7 @@
+16:17:17 [WARNING] vgamepad not installed - XInput emulation disabled
+16:17:17 [WARNING]   To enable: pip install vgamepad
+16:17:17 [WARNING]   (requires ViGEmBus driver - installer opens automatically)
+16:17:18 [INFO] Client connected: 127.0.0.1
+16:17:18 [INFO] Client disconnected: 127.0.0.1
+16:17:18 [INFO] 127.0.0.1 [26/May/2026:16:17:18 +0100] "GET /ws HTTP/1.1" 101 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36 Edg/148.0.0.0"
+16:17:21 [INFO] 127.0.0.1 [26/May/2026:16:17:21 +0100] "GET / HTTP/1.1" 200 237 "-" "Mozilla/5.0 (Windows NT; Windows NT 10.0; zh-CN) WindowsPowerShell/5.1.26100.8457"

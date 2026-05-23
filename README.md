@@ -1,8 +1,8 @@
 # hub-control v2
 
-**Turn your tablet or phone into a virtual Xbox controller for your PC games.**
+Tired of remembering shortcut? hub-control got you covered.
 
-Create custom on-screen gamepad layouts — joysticks, triggers, buttons, D-pads — that map to a virtual Xbox 360 controller or keyboard shortcuts. Perfect for simulators (Euro Truck Simulator 2, flight sims, racing games) where memorizing keyboard shortcuts is painful.
+Create custom on-screen gamepad layouts — joysticks, triggers, buttons, D-pads — that map to a virtual Xbox 360 controller or keyboard shortcuts. Select you own image for each button. Perfect for simulators (Euro Truck Simulator 2, flight sims, racing games) where memorizing keyboard shortcuts is painful.
 
 ---
 
@@ -18,10 +18,6 @@ Create custom on-screen gamepad layouts — joysticks, triggers, buttons, D-pads
 ### Option 2: Run from Source
 
 ```bash
-# Create virtual environment
-python -m venv .venv
-.venv\Scripts\activate
-
 # Install dependencies
 pip install -r server/requirements.txt
 
@@ -56,75 +52,6 @@ Virtual Xbox controller emulation requires the **ViGEmBus** driver:
 3. Restart the server — the status window will show "XInput ENABLED"
 
 > **Note:** ViGEmBus installation requires administrator privileges and a one-time driver setup. Without it, keyboard shortcuts work fully — only the virtual Xbox controller features (analog sticks, triggers) are disabled.
-
----
-
-## Building from Source
-
-```bash
-# Install build dependencies
-pip install pyinstaller
-
-# Build executable (includes client files)
-pyinstaller hub-control.spec
-
-# Output: dist/hub-control-server.exe
-```
-
----
-
-## Project Structure
-
-```
-hub-control/
-├── server/
-│   ├── main.py              # Server: HTTP + WebSocket + XInput + keyboard
-│   └── requirements.txt     # Python dependencies
-├── client/
-│   ├── index.html           # Web client shell
-│   ├── css/main.css         # Dark theme, control styles
-│   ├── js/
-│   │   ├── app.js           # Main controller, mode switching
-│   │   ├── controls.js      # Joystick, trigger, button, DPad classes
-│   │   ├── editor.js        # Visual editor, drag-to-move, undo/redo
-│   │   ├── storage.js       # Import/export, localStorage profiles
-│   │   ├── ui.js            # Toolbar, menus, toasts
-│   │   └── websocket.js     # WebSocket manager with auto-reconnect
-│   └── layouts/
-│       └── ets2.hublayout   # Euro Truck Simulator 2 template
-├── hub-control.spec          # PyInstaller build spec
-├── run_server.bat            # One-click launcher for dev
-└── PLAN.md                   # Architecture & design document
-```
-
----
-
-## Usage
-
-### Server (PC)
-
-1. Start `hub-control-server.exe`
-2. Note the IP address shown in the status window
-3. The server runs on port **8080**
-
-### Client (Tablet / Phone)
-
-1. Connect your device to the same network as the server PC
-2. Open a browser and navigate to `http://<SERVER_IP>:8080/`
-3. **Play Mode** (default) — touch controls to send input
-4. Tap the ✏️ button to enter **Edit Mode** — add, move, and configure controls
-5. Use the ☰ menu to save/load profiles, import/export layouts
-
-### Pre-built Layouts
-
-Load the included ETS2 template from the menu:
-- **Left joystick** → Steering
-- **Left trigger** → Brake
-- **Right trigger** → Throttle
-- **D-Pad** → Menu navigation
-- **Xbox buttons** → A/B/X/Y actions
-- **Shoulder buttons** → Turn signals
-- **Keyboard buttons** → F3-F8, Esc, Enter
 
 ---
 

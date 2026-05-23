@@ -26,15 +26,83 @@ logging.basicConfig(
 log = logging.getLogger("hub-control")
 
 # ---------------------------------------------------------------------------
-# XInput (vgamepad) - optional but recommended
+# XInput (vgamepad + ViGEmBus) — optional
+# Virtual Xbox controller requires the ViGEmBus driver from:
+#   https://vigembus.us/download/
 # ---------------------------------------------------------------------------
-try:
-    import vgamepad as vg
 
+_VIGEMBUS_DOWNLOAD = "https://vigembus.us/download/"
+
+
+def _detect_vigembus_driver() -> bool:
+    """Check whether the ViGEmBus kernel driver is installed on this system."""
+    import os as _os
+
+    # 1) Check driver file in System32\drivers
+    windir = _os.environ.get("SystemRoot", r"C:\Windows")
+    for sub in [r"System32\drivers\ViGEmBus.sys", r"Sysnative\drivers\ViGEmBus.sys"]:
+        if _os.path.isfile(_os.path.join(windir, sub)):
+            return True
+
+    # 2) Check common install directories (including user-specified paths)
+    for prog in [_os.environ.get("ProgramFiles", r"C:\Program Files"),
+                 _os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"),
+                 r"F:\Program Files"]:
+        if _os.path.isdir(_os.path.join(prog, "Nefarius Software Solutions")):
+            return True
+
+    # 3) Check Windows registry
+    try:
+        import winreg
+        for key in [r"SOFTWARE\Nefarius Software Solutions\ViGEmBus",
+                     r"SOFTWARE\WOW6432Node\Nefarius Software Solutions\ViGEmBus"]:
+            try:
+                winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key).Close()
+                return True
+            except OSError:
+                pass
+    except Exception:
+        pass
+
+    return False
+
+
+def _try_import_vgamepad():
+    """Try to import vgamepad. Returns the module on success, None on failure."""
+    try:
+        import vgamepad
+        return vgamepad
+    except Exception:
+        pass
+
+    # Search system site-packages (fallback for non-bundled runs)
+    try:
+        import site as _site
+        search_paths = []
+        try:
+            search_paths.extend(_site.getsitepackages())
+        except Exception:
+            pass
+        try:
+            search_paths.append(_site.getusersitepackages())
+        except Exception:
+            pass
+        for sp in search_paths:
+            if sp not in sys.path:
+                sys.path.insert(0, sp)
+        import vgamepad
+        return vgamepad
+    except Exception:
+        return None
+
+
+_vigembus_installed = _detect_vigembus_driver()
+vg = _try_import_vgamepad()
+
+if vg is not None and _vigembus_installed:
     _VX = vg.VX360Gamepad
     _BTN = vg.XUSB_BUTTON
 
-    # Xbox button name -> vgamepad constant
     XBOX_BUTTON_MAP: dict[str, int] = {
         "A": _BTN.XUSB_GAMEPAD_A,
         "B": _BTN.XUSB_GAMEPAD_B,
@@ -56,14 +124,12 @@ try:
     gamepad: "vg.VX360Gamepad | None" = None
 
     def init_gamepad() -> "vg.VX360Gamepad":
-        """Create the singleton virtual Xbox 360 controller."""
         g = _VX()
-        g.update()  # send neutral state
+        g.update()
         log.info("Virtual Xbox 360 controller created via ViGEmBus")
         return g
 
     def apply_gamepad_state(state: dict) -> None:
-        """Apply a full gamepad state dict from the client."""
         global gamepad
         if gamepad is None:
             gamepad = init_gamepad()
@@ -73,7 +139,6 @@ try:
         tr = state.get("triggers", {})
         btns = state.get("buttons", {})
 
-        # Analog sticks (normalized -1..1 floats)
         gamepad.left_joystick_float(
             x_value_float=float(ls.get("x", 0.0)),
             y_value_float=float(ls.get("y", 0.0)),
@@ -82,12 +147,9 @@ try:
             x_value_float=float(rs.get("x", 0.0)),
             y_value_float=float(rs.get("y", 0.0)),
         )
-
-        # Analog triggers (0..1 floats)
         gamepad.left_trigger_float(value_float=float(tr.get("left", 0.0)))
         gamepad.right_trigger_float(value_float=float(tr.get("right", 0.0)))
 
-        # Buttons (boolean dict)
         for name, pressed in btns.items():
             btn_const = XBOX_BUTTON_MAP.get(name)
             if btn_const is None:
@@ -100,23 +162,30 @@ try:
         gamepad.update()
 
     def reset_gamepad() -> None:
-        """Reset virtual controller to neutral (called on disconnect)."""
         global gamepad
         if gamepad is not None:
             gamepad.reset()
             gamepad.update()
 
-except ImportError:
-    log.warning("vgamepad not installed - XInput emulation disabled")
-    vg = None  # type: ignore
+else:
     gamepad = None
+
+    if vg is not None and not _vigembus_installed:
+        log.warning("ViGEmBus driver NOT detected on this system")
+        log.warning("  Virtual gamepad (XInput) features DISABLED.")
+        log.warning(f"  Download the driver from: {_VIGEMBUS_DOWNLOAD}")
+        log.warning("  Keyboard shortcuts still work fully.")
+    elif vg is not None and _vigembus_installed:
+        # Shouldn't reach here — handled by the 'if' branch above
+        pass
+    else:
+        log.warning("ViGEmBus driver not detected — XInput disabled")
+        log.warning(f"  For virtual controller support, download ViGEmBus from: {_VIGEMBUS_DOWNLOAD}")
 
     def init_gamepad():  # type: ignore
         return None
-
     def apply_gamepad_state(state):  # type: ignore
         pass
-
     def reset_gamepad():  # type: ignore
         pass
 
@@ -350,7 +419,13 @@ def ui_log(message: str) -> None:
 # ---------------------------------------------------------------------------
 # HTTP routes
 # ---------------------------------------------------------------------------
-CLIENT_DIR = Path(__file__).resolve().parent.parent / "client"
+# Determine base directory (works both from source and PyInstaller frozen exe)
+if getattr(sys, "frozen", False):
+    _BASE_DIR = Path(sys._MEIPASS)
+else:
+    _BASE_DIR = Path(__file__).resolve().parent.parent
+
+CLIENT_DIR = _BASE_DIR / "client"
 
 
 async def index_handler(request: web.Request) -> web.FileResponse:
