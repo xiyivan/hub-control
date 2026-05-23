@@ -1,0 +1,14 @@
+# hub-control server dependencies
+# Install: python -m pip install -r requirements.txt
+
+# XInput virtual controller emulation (requires ViGEmBus driver - auto-installs on first run)
+vgamepad>=0.1.3
+
+# WebSocket + HTTP server
+aiohttp>=3.9
+
+# Keyboard simulation (fallback for non-XInput keys like F3-F8, Esc)
+pydirectinput>=1.0
+
+# WebSocket client utilities (bundled with aiohttp but explicit for clarity)
+websockets>=12.0
