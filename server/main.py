@@ -194,7 +194,7 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
     ws = web.WebSocketResponse()
     await ws.prepare(request)
     peer = request.remote
-    log.info(f"Client connected: {peer}")
+    ui_log(f"Client connected: {peer}")
 
     try:
         async for msg in ws:
@@ -226,10 +226,125 @@ async def ws_handler(request: web.Request) -> web.WebSocketResponse:
     except asyncio.CancelledError:
         pass
     finally:
-        log.info(f"Client disconnected: {peer}")
+        ui_log(f"Client disconnected: {peer}")
         reset_gamepad()
 
     return ws
+
+
+# ---------------------------------------------------------------------------
+# Server UI (tkinter status window)
+# ---------------------------------------------------------------------------
+import threading
+import queue as _queue_mod
+import tkinter as tk
+from tkinter import ttk, scrolledtext
+from datetime import datetime
+
+_ui_queue: "_queue_mod.Queue" = _queue_mod.Queue()
+
+
+class ServerUI:
+    """Simple tkinter window showing server info and connection log."""
+
+    def __init__(self, local_ip: str, port: int, xinput_enabled: bool):
+        self.root = tk.Tk()
+        self.root.title("hub-control v2 — Server")
+        self.root.geometry("420x380")
+        self.root.resizable(True, True)
+        self.root.configure(bg="#0d1117")
+        self.root.protocol("WM_DELETE_WINDOW", self._on_close)
+
+        # --- Style ---
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("TFrame", background="#0d1117")
+        style.configure("TLabel", background="#0d1117", foreground="#e6edf3", font=("Segoe UI", 10))
+        style.configure("Title.TLabel", font=("Segoe UI", 18, "bold"), foreground="#58a6ff")
+        style.configure("IP.TLabel", font=("Consolas", 20, "bold"), foreground="#3fb950")
+        style.configure("Sub.TLabel", font=("Segoe UI", 9), foreground="#8b949e")
+        style.configure("Green.TLabel", foreground="#3fb950")
+        style.configure("Red.TLabel", foreground="#f85149")
+        style.configure("TButton", font=("Segoe UI", 10))
+
+        main_frame = ttk.Frame(self.root, padding=16)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Title
+        ttk.Label(main_frame, text="hub-control v2", style="Title.TLabel").pack(anchor=tk.W)
+
+        # IP address
+        ttk.Label(main_frame, text="Server IP", style="Sub.TLabel").pack(anchor=tk.W, pady=(12, 0))
+        ttk.Label(main_frame, text=local_ip, style="IP.TLabel").pack(anchor=tk.W)
+
+        # Port & XInput status
+        info_frame = ttk.Frame(main_frame)
+        info_frame.pack(fill=tk.X, pady=(8, 0))
+        ttk.Label(info_frame, text=f"Port: {port}").pack(side=tk.LEFT)
+        status_text = "XInput ENABLED" if xinput_enabled else "XInput disabled"
+        status_style = "Green.TLabel" if xinput_enabled else "Red.TLabel"
+        ttk.Label(info_frame, text=f"  |  {status_text}", style=status_style).pack(side=tk.LEFT)
+
+        # URLs
+        url_frame = ttk.Frame(main_frame)
+        url_frame.pack(fill=tk.X, pady=(8, 0))
+        ttk.Label(url_frame, text=f"HTTP:  http://{local_ip}:{port}/", style="Sub.TLabel").pack(anchor=tk.W)
+        ttk.Label(url_frame, text=f"WS:    ws://{local_ip}:{port}/ws", style="Sub.TLabel").pack(anchor=tk.W)
+
+        # Connection log
+        ttk.Label(main_frame, text="Connection Log", style="Sub.TLabel").pack(anchor=tk.W, pady=(16, 4))
+        self.log_area = scrolledtext.ScrolledText(
+            main_frame, height=10, bg="#161b22", fg="#e6edf3",
+            font=("Consolas", 9), relief=tk.FLAT, borderwidth=0,
+            insertbackground="#e6edf3",
+        )
+        self.log_area.pack(fill=tk.BOTH, expand=True)
+        self.log_area.configure(state=tk.DISABLED)
+
+        # Bottom bar
+        bottom = ttk.Frame(main_frame)
+        bottom.pack(fill=tk.X, pady=(8, 0))
+        self.status_label = ttk.Label(bottom, text="● Running", style="Green.TLabel")
+        self.status_label.pack(side=tk.LEFT)
+        ttk.Button(bottom, text="Copy IP", command=self._copy_ip).pack(side=tk.RIGHT)
+
+        self._log(f"Server started on {local_ip}:{port}")
+        self._poll_queue()
+
+    def _log(self, message: str) -> None:
+        ts = datetime.now().strftime("%H:%M:%S")
+        line = f"[{ts}] {message}\n"
+        self.log_area.configure(state=tk.NORMAL)
+        self.log_area.insert(tk.END, line)
+        self.log_area.see(tk.END)
+        self.log_area.configure(state=tk.DISABLED)
+
+    def _copy_ip(self) -> None:
+        self.root.clipboard_clear()
+        self.root.clipboard_append(get_local_ip())
+        self._log("IP copied to clipboard")
+
+    def _poll_queue(self) -> None:
+        try:
+            while True:
+                msg = _ui_queue.get_nowait()
+                self._log(msg)
+        except _queue_mod.Empty:
+            pass
+        self.root.after(300, self._poll_queue)
+
+    def _on_close(self) -> None:
+        import os
+        os._exit(0)
+
+    def run(self) -> None:
+        self.root.mainloop()
+
+
+def ui_log(message: str) -> None:
+    """Thread-safe log to the server UI window."""
+    _ui_queue.put(message)
+    log.info(message)
 
 
 # ---------------------------------------------------------------------------
@@ -289,22 +404,25 @@ def get_local_ip() -> str:
 
 
 def main() -> None:
-    """Start the hub-control server."""
+    """Start the hub-control server with tkinter status window."""
     host = "0.0.0.0"
     port = 8080
     local_ip = get_local_ip()
+    xinput_ok = vg is not None
 
-    print("=" * 50)
-    print("  hub-control v2 - Server")
-    print("=" * 50)
-    print(f"  Local IP:   {local_ip}")
-    print(f"  HTTP:       http://{local_ip}:{port}/")
-    print(f"  WebSocket:  ws://{local_ip}:{port}/ws")
-    print(f"  XInput:     {'enabled' if vg is not None else 'DISABLED (install vgamepad)'}")
-    print("=" * 50)
-
+    # Build aiohttp app
     app = create_app()
-    web.run_app(app, host=host, port=port, print=None)
+
+    # Start aiohttp in a daemon thread
+    def run_server():
+        web.run_app(app, host=host, port=port, print=None)
+
+    server_thread = threading.Thread(target=run_server, daemon=True)
+    server_thread.start()
+
+    # Run tkinter UI in the main thread (blocks until window closes)
+    ui = ServerUI(local_ip, port, xinput_ok)
+    ui.run()
 
 
 if __name__ == "__main__":
