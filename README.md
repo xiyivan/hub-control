@@ -35,7 +35,7 @@ python server/main.py
 | ⌨️ **Keyboard Shortcuts** | Map buttons to any keyboard key or combo (F3-F8, Esc, Ctrl+Shift, etc.) |
 | ✏️ **Visual Editor** | Drag-and-drop controls, snap-to-grid, properties panel — build your layout without coding |
 | 💾 **Profiles** | Save/load layouts, import/export `.hublayout` files, share with others |
-| 📱 **Mobile-First** | Touch-optimized UI, works on any device with a browser |
+| 📱 **No Client Required** | Touch-optimized UI, works on any device with a browser |
 | 🔌 **Auto-Reconnect** | Client automatically reconnects if connection drops |
 
 ---
@@ -44,14 +44,11 @@ python server/main.py
 
 Virtual Xbox controller emulation requires the **ViGEmBus** driver:
 
-1. Run the following to install:
-   ```bash
-   pip install vgamepad
-   ```
-2. This will open the ViGEmBus driver installer — accept the prompts to install
+1. Download the installer from **[vigembus.us/download](https://vigembus.us/download/)**
+2. Run the installer — accept the prompts (requires administrator privileges)
 3. Restart the server — the status window will show "XInput ENABLED"
 
-> **Note:** ViGEmBus installation requires administrator privileges and a one-time driver setup. Without it, keyboard shortcuts work fully — only the virtual Xbox controller features (analog sticks, triggers) are disabled.
+> **Note:** The server automatically detects whether ViGEmBus is installed. Without it, keyboard shortcuts work fully — only the virtual Xbox controller features (analog sticks, triggers) are disabled.
 
 ---
 
