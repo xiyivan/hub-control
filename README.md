@@ -50,9 +50,3 @@ Virtual Xbox controller emulation requires the **ViGEmBus** driver:
 
 > **Note:** The server automatically detects whether ViGEmBus is installed. Without it, keyboard shortcuts work fully — only the virtual Xbox controller features (analog sticks, triggers) are disabled.
 
----
-
-## License
-
-MIT
-
